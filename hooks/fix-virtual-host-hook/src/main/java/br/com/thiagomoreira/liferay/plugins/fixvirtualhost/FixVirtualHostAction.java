@@ -17,6 +17,8 @@ package br.com.thiagomoreira.liferay.plugins.fixvirtualhost;
 
 import com.liferay.portal.kernel.events.ActionException;
 import com.liferay.portal.kernel.events.SimpleAction;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -27,6 +29,8 @@ import com.liferay.portal.service.CompanyLocalServiceUtil;
  * @author Thiago Moreira
  */
 public class FixVirtualHostAction extends SimpleAction {
+
+	private static Log log = LogFactoryUtil.getLog(FixVirtualHostAction.class);
 
 	@Override
 	public void run(String[] ids) throws ActionException {
@@ -45,10 +49,17 @@ public class FixVirtualHostAction extends SimpleAction {
 
 			String virtualHost = company.getVirtualHostname();
 			if (!virtualHost.equals(liferayVirtualHost)) {
-				CompanyLocalServiceUtil.updateCompany(companyId, liferayVirtualHost,
-						company.getMx(), company.getMaxUsers(),
-						company.getActive());
+				log.info("Updating virtual host to: " + liferayVirtualHost);
+
+				CompanyLocalServiceUtil.updateCompany(companyId,
+						liferayVirtualHost, company.getMx(),
+						company.getMaxUsers(), company.getActive());
+			} else {
+				log.info("System property 'liferay.virtual.host' and virtual host has the same value: "
+						+ liferayVirtualHost);
 			}
+		} else {
+			log.info("System property 'liferay.virtual.host' is empty");
 		}
 	}
 }

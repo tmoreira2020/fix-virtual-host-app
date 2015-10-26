@@ -8,7 +8,9 @@ This app acts in the startup time of portal and help to fix the virtual host of 
 
 ### Sample
 
-```-Dliferay.virtual.host=dev.myliferay.com```
+```shell
+-Dliferay.virtual.host=dev.myliferay.com
+```
 
 ### License
 

@@ -34,7 +34,7 @@ Maven:
 <dependency>
     <groupId>br.com.thiagomoreira.liferay.plugins.fix-virtual-host-app</groupId>
     <artifactId>fix-virtual-host-app</artifactId>
-    <version>1.0.0</version>
+    <version>1.1.0</version>
     <type>lpkg</type>
 </dependency>
 ```
@@ -42,7 +42,7 @@ Gradle:
 
 ```groovy
 dependencies {
-    compile(group: "br.com.thiagomoreira.liferay.plugins.fix-virtual-host-app", name: "fix-virtual-host-app", version: "1.0.0", type: "lpkg");
+    compile(group: "br.com.thiagomoreira.liferay.plugins.fix-virtual-host-app", name: "fix-virtual-host-app", version: "1.1.0", type: "lpkg");
 }
 ```
 ### Support

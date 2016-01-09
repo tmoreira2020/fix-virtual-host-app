@@ -4,12 +4,20 @@ Fix Virtual Host App
 [![Coverage Status](https://coveralls.io/repos/tmoreira2020/fix-virtual-host-app/badge.svg?branch=master)](https://coveralls.io/r/tmoreira2020/fix-virtual-host-app?branch=master)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/br.com.thiagomoreira.liferay.plugins.fix-virtual-host-app/fix-virtual-host-app/badge.svg)](https://maven-badges.herokuapp.com/maven-central/br.com.thiagomoreira.liferay.plugins.fix-virtual-host-app/fix-virtual-host-app)
 
-This app acts in the startup time of portal and help to fix the virtual host of Liferay. Given an existent database dump that points to a domain and a new environment needs to have a different domain the app will read a system property called `liferay.virtual.host` and set the value as the new company virtual host. For instance if the database dump points to `www.myliferay.com` and the property points to `dev.myliferay.com` the app will replace the former with the value of the latter. It was developed to avoid the redirect loop problem.
+The app proccess all virtual hosts replacing the prefix declared in the property `virtual.host.old.prefix` with the prefix declared in the property `virtual.host.new.prefix`. For instance if the database has the following virtual hosts:
+  * www.myliferay.com
+  * www.portalliferay.com
+  * newportal.com
+
+and the properties are set as `virtual.host.old.prefix=www` and `virtual.host.new.prefix=dev` after the hook run the new value of virtual hosts will be:
+  * dev.myliferay.com
+  * dev.portalliferay.com
+  * dev.newportal.com
 
 ### Sample
 
 ```shell
--Dliferay.virtual.host=dev.myliferay.com
+-Dvirtual.host.old.prefix=www -Dvirtual.host.new.prefix=dev
 ```
 
 ### License

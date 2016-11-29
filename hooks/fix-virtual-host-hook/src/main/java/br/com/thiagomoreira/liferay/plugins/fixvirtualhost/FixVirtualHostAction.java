@@ -15,6 +15,10 @@
  */
 package br.com.thiagomoreira.liferay.plugins.fixvirtualhost;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Property;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
@@ -25,8 +29,10 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.PropertiesUtil;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.Company;
 import com.liferay.portal.model.Group;
@@ -52,102 +58,122 @@ public class FixVirtualHostAction extends SimpleAction {
 	}
 
 	private void doRun(final long companyId) throws Exception {
-		final String virtualHostOldPrefix = PropsUtil
-				.get("virtual.host.old.prefix");
-		final String virtualHostNewPrefix = PropsUtil
-				.get("virtual.host.new.prefix");
+		String[] temp = StringUtil.split(PropsUtil.get("virtual.host.mapping"));
 
-		if (Validator.isNotNull(virtualHostOldPrefix)
-				&& !virtualHostOldPrefix.equals(virtualHostNewPrefix)) {
-			Company company = CompanyLocalServiceUtil.getCompany(companyId);
+		final Map<String, String> virtualHostMapping = new HashMap<String, String>();
 
-			String companyVirtualHost = company.getVirtualHostname();
-			companyVirtualHost = fixVirtualHost(companyVirtualHost,
-					virtualHostOldPrefix, virtualHostNewPrefix);
+		for (String mapping : temp) {
+			Properties properties = PropertiesUtil.load(mapping);
+			virtualHostMapping.putAll((Map) properties);
+		}
 
-			if (Validator.isNotNull(companyVirtualHost)) {
-				log.info("Updating company virtual host to: "
-						+ companyVirtualHost);
+		for (String virtualHostNewPrefix : virtualHostMapping.keySet()) {
 
-				CompanyLocalServiceUtil.updateCompany(companyId,
-						companyVirtualHost, company.getMx(),
-						company.getMaxUsers(), company.getActive());
+			final String virtualHostOldPrefix = virtualHostMapping
+					.get(virtualHostNewPrefix);
+
+			if (Validator.isNotNull(virtualHostOldPrefix)
+					&& !virtualHostOldPrefix.equals(virtualHostNewPrefix)) {
+				Company company = CompanyLocalServiceUtil.getCompany(companyId);
+
+				String companyVirtualHost = company.getVirtualHostname();
+				companyVirtualHost = fixVirtualHost(companyVirtualHost,
+						virtualHostMapping);
+
+				if (Validator.isNotNull(companyVirtualHost)) {
+					log.info("Updating company virtual host to: "
+							+ companyVirtualHost);
+
+					CompanyLocalServiceUtil.updateCompany(companyId,
+							companyVirtualHost, company.getMx(),
+							company.getMaxUsers(), company.getActive());
+				}
+
+				GroupActionableDynamicQuery actionableDynamicQuery = new GroupActionableDynamicQuery() {
+
+					@Override
+					protected void performAction(Object object)
+							throws PortalException, SystemException {
+						Group group = (Group) object;
+
+						LayoutSet layoutSet = group.getPublicLayoutSet();
+
+						if (layoutSet != null) {
+							String layoutVirtualHost = layoutSet
+									.getVirtualHostname();
+							layoutVirtualHost = fixVirtualHost(
+									layoutVirtualHost, virtualHostMapping);
+
+							if (Validator.isNotNull(layoutVirtualHost)) {
+								log.info("Updating layout virtual host to: "
+										+ layoutVirtualHost);
+
+								LayoutSetLocalServiceUtil.updateVirtualHost(
+										group.getGroupId(), false,
+										layoutVirtualHost);
+							}
+						}
+
+						layoutSet = group.getPrivateLayoutSet();
+
+						if (layoutSet != null) {
+							String layoutVirtualHost = layoutSet
+									.getVirtualHostname();
+							layoutVirtualHost = fixVirtualHost(
+									layoutVirtualHost, virtualHostMapping);
+
+							if (Validator.isNotNull(layoutVirtualHost)) {
+								log.info("Updating layout virtual host to: "
+										+ layoutVirtualHost);
+
+								LayoutSetLocalServiceUtil.updateVirtualHost(
+										group.getGroupId(), true,
+										layoutVirtualHost);
+							}
+						}
+					}
+
+					@Override
+					protected void addCriteria(DynamicQuery dynamicQuery) {
+						Property property = PropertyFactoryUtil.forName("site");
+
+						dynamicQuery.add(property.eq(true));
+					}
+				};
+
+				actionableDynamicQuery.setCompanyId(companyId);
+				actionableDynamicQuery.performActions();
+			} else {
+				log.info("Skiiping executing due properties values virtual.host.old.prefix="
+						+ virtualHostOldPrefix
+						+ " and virtual.host.new.prefix="
+						+ virtualHostNewPrefix);
 			}
-
-			GroupActionableDynamicQuery actionableDynamicQuery = new GroupActionableDynamicQuery() {
-
-				@Override
-				protected void performAction(Object object)
-						throws PortalException, SystemException {
-					Group group = (Group) object;
-
-					LayoutSet layoutSet = group.getPublicLayoutSet();
-
-					if (layoutSet != null) {
-						String layoutVirtualHost = layoutSet
-								.getVirtualHostname();
-						layoutVirtualHost = fixVirtualHost(layoutVirtualHost,
-								virtualHostOldPrefix, virtualHostNewPrefix);
-
-						if (Validator.isNotNull(layoutVirtualHost)) {
-							log.info("Updating layout virtual host to: "
-									+ layoutVirtualHost);
-
-							LayoutSetLocalServiceUtil.updateVirtualHost(
-									group.getGroupId(), false,
-									layoutVirtualHost);
-						}
-					}
-
-					layoutSet = group.getPrivateLayoutSet();
-
-					if (layoutSet != null) {
-						String layoutVirtualHost = layoutSet
-								.getVirtualHostname();
-						layoutVirtualHost = fixVirtualHost(layoutVirtualHost,
-								virtualHostOldPrefix, virtualHostNewPrefix);
-
-						if (Validator.isNotNull(layoutVirtualHost)) {
-							log.info("Updating layout virtual host to: "
-									+ layoutVirtualHost);
-
-							LayoutSetLocalServiceUtil
-									.updateVirtualHost(group.getGroupId(),
-											true, layoutVirtualHost);
-						}
-					}
-				}
-
-				@Override
-				protected void addCriteria(DynamicQuery dynamicQuery) {
-					Property property = PropertyFactoryUtil.forName("site");
-
-					dynamicQuery.add(property.eq(true));
-				}
-			};
-
-			actionableDynamicQuery.setCompanyId(companyId);
-			actionableDynamicQuery.performActions();
-		} else {
-			log.info("Skiiping executing due properties values virtual.host.old.prefix="
-					+ virtualHostOldPrefix
-					+ " and virtual.host.new.prefix="
-					+ virtualHostNewPrefix);
 		}
 	}
 
-	private String fixVirtualHost(String virtualHost,
-			String virtualHostOldPrefix, String virtualHostNewPrefix) {
-		if (Validator.isNotNull(virtualHost)
-				&& !virtualHost.startsWith(virtualHostNewPrefix)) {
-			if (virtualHost.startsWith(virtualHostOldPrefix)) {
-				return virtualHost.replaceFirst(virtualHostOldPrefix,
+	protected String fixVirtualHost(String virtualHost,
+			Map<String, String> virtualHostMapping) {
+
+		if (Validator.isNotNull(virtualHost)) {
+			int endIndex = virtualHost.indexOf(StringPool.PERIOD);
+			String currentPrefix = virtualHost.substring(0, endIndex);
+			String virtualHostNewPrefix = virtualHostMapping.get(currentPrefix);
+
+			if (Validator.isNotNull(virtualHostNewPrefix)) {
+				return virtualHost.replaceFirst(currentPrefix,
 						virtualHostNewPrefix);
 			} else {
-				return virtualHostNewPrefix + StringPool.PERIOD + virtualHost;
+				if (!virtualHostMapping.containsValue(currentPrefix)) {
+					String defaultPrefix = PropsUtil
+							.get("virtual.host.default.prefix");
+
+					if (!virtualHost.startsWith(defaultPrefix)) {
+						return defaultPrefix + StringPool.PERIOD + virtualHost;
+					}
+				}
 			}
 		}
-
 		return null;
 	}
 

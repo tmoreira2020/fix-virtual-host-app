@@ -35,7 +35,7 @@ after_success:
       mvn clean deploy;
       git checkout -b develop;
       git merge master;
-      mvn build-helper:parse-version versions:set -DnewVersion=$\{parsedVersion.nextMajorVersion\}.$\{parsedVersion.nextMinorVersion\}.$\{parsedVersion.incrementalVersion\}-SNAPSHOT;
+      mvn build-helper:parse-version versions:set -DnewVersion=$\{parsedVersion.majorVersion\}.$\{parsedVersion.minorVersion\}.$\{parsedVersion.nextIncrementalVersion\}-SNAPSHOT;
       git commit -am "Prepare for next development iteration";
       mvn deploy;
     fi;

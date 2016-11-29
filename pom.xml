@@ -153,6 +153,13 @@
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>buildnumber-maven-plugin</artifactId>
 			</plugin>
+			<plugin>
+				<groupId>org.eluder.coveralls</groupId>
+				<artifactId>coveralls-maven-plugin</artifactId>
+				<configuration>
+					<repoToken>x16MljgOuJRXsEldXPhBwn8jsUuQZpwlg</repoToken>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 </project>

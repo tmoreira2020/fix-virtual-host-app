@@ -141,15 +141,6 @@
 		</pluginManagement>
 		<plugins>
 			<plugin>
-				<groupId>com.github.ekryd.sortpom</groupId>
-				<artifactId>sortpom-maven-plugin</artifactId>
-				<version>2.4.0</version>
-				<configuration>
-					<createBackupFile>false</createBackupFile>
-					<nrOfIndentSpace>-1</nrOfIndentSpace>
-				</configuration>
-			</plugin>
-			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>buildnumber-maven-plugin</artifactId>
 			</plugin>

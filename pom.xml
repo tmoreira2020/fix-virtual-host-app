@@ -44,9 +44,9 @@
 	<properties>
 		<liferay.app.server.portal.dir>${liferay.home}/tomcat-7.0.42/webapps/ROOT</liferay.app.server.portal.dir>
 		<liferay.auto.deploy.dir>${liferay.home}/deploy</liferay.auto.deploy.dir>
-		<liferay.dependencies.version>6.2.0-ga1</liferay.dependencies.version>
+		<liferay.dependencies.version>6.2.5</liferay.dependencies.version>
 		<liferay.home>${user.home}/projects/thiagomoreira/liferay-portal-6.2-ce-ga4</liferay.home>
-		<liferay.plugins.version>6.2.0-ga1</liferay.plugins.version>
+		<liferay.plugins.version>6.2.2</liferay.plugins.version>
 	</properties>
 	<dependencyManagement>
 		<dependencies>

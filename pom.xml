@@ -42,10 +42,10 @@
 		<url>https://github.com/tmoreira2020/fix-virtual-host-app</url>
 	</scm>
 	<properties>
-		<liferay.app.server.portal.dir>${liferay.home}/tomcat-7.0.42/webapps/ROOT</liferay.app.server.portal.dir>
+		<liferay.app.server.portal.dir>${liferay.home}/tomcat-7.0.62/webapps/ROOT</liferay.app.server.portal.dir>
 		<liferay.auto.deploy.dir>${liferay.home}/deploy</liferay.auto.deploy.dir>
 		<liferay.dependencies.version>6.2.5</liferay.dependencies.version>
-		<liferay.home>${user.home}/projects/thiagomoreira/liferay-portal-6.2-ce-ga4</liferay.home>
+		<liferay.home>${user.home}/projects/thiagomoreira/liferay-portal-6.2-ce-ga6</liferay.home>
 		<liferay.plugins.version>6.2.2</liferay.plugins.version>
 	</properties>
 	<dependencyManagement>

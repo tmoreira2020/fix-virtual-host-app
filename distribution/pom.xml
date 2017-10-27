@@ -19,8 +19,8 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<artifactId>fix-virtual-host-app-parent</artifactId>
 		<groupId>br.com.thiagomoreira.liferay.plugins.fix-virtual-host-app</groupId>
+		<artifactId>fix-virtual-host-app-parent</artifactId>
 		<version>1.2.1-SNAPSHOT</version>
 	</parent>
 	<artifactId>fix-virtual-host-app</artifactId>
@@ -35,10 +35,10 @@
 				<executions>
 					<execution>
 						<id>distro-assembly</id>
-						<phase>package</phase>
 						<goals>
 							<goal>single</goal>
 						</goals>
+						<phase>package</phase>
 						<configuration>
 							<appendAssemblyId>false</appendAssemblyId>
 							<tarLongFileMode>gnu</tarLongFileMode>
@@ -55,10 +55,10 @@
 				<executions>
 					<execution>
 						<id>attach-instrumented-jar</id>
-						<phase>package</phase>
 						<goals>
 							<goal>attach-artifact</goal>
 						</goals>
+						<phase>package</phase>
 						<configuration>
 							<artifacts>
 								<artifact>

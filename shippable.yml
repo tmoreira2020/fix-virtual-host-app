@@ -26,11 +26,9 @@ env:
   global:
     - secure: DfPKfCWIlOqUUIMosOhbY0ciXtgDEIhIT8fAnWKe2U29/Ksvom7fi3JVGJ3s2zw6Oxyux7zK9EcWCT+161bDVQAxdoKRNSD30DqcNeEPBrUVNgK4hnpk9rZ1HFbiCYk+h6Fzbeo4bj366/soTZU1CHlkF8k1q1rhNlpMBRZHXrekU7wjUgP2M4RXjqSinf0IJIZoiq/Yj1NTGY83+zi/RWVm4UaxpuX8B9CXhQiFdQvxpDdizH05akTABsnPdnLmmbJP26/RdNzlS3B+mWW5yyBRPowh/JbgvYdfIRdbPUv0yMzKRlmRaV8AE5wKPQX5NcsHElNnagwwbYYOTKHcSw==
 
-before_install:
-   - mkdir -p ~/.m2
-   - cp src/main/maven/settings.xml ~/.m2/settings.xml
-           
 before_script:
+  - mkdir -p ~/.m2
+  - cp src/main/maven/settings.xml ~/.m2/settings.xml
   - git remote set-url origin git@github.com:$REPO_NAME.git
 
 after_success:

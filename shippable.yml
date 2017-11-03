@@ -18,7 +18,7 @@
 language: java
 
 jdk:
-  - oraclejdk7
+  - oraclejdk8
 
 env:                                                
   - SEED_VERSION=1.2.0                           

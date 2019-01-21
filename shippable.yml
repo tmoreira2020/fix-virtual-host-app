@@ -14,7 +14,6 @@
 # limitations under the License.
 #
 
-
 language: java
 
 jdk:
@@ -22,7 +21,7 @@ jdk:
 
 env:
   global:
-    - SEED_VERSION=1.2.0
+    - SEED_VERSION=2.0.0
     - secure: DfPKfCWIlOqUUIMosOhbY0ciXtgDEIhIT8fAnWKe2U29/Ksvom7fi3JVGJ3s2zw6Oxyux7zK9EcWCT+161bDVQAxdoKRNSD30DqcNeEPBrUVNgK4hnpk9rZ1HFbiCYk+h6Fzbeo4bj366/soTZU1CHlkF8k1q1rhNlpMBRZHXrekU7wjUgP2M4RXjqSinf0IJIZoiq/Yj1NTGY83+zi/RWVm4UaxpuX8B9CXhQiFdQvxpDdizH05akTABsnPdnLmmbJP26/RdNzlS3B+mWW5yyBRPowh/JbgvYdfIRdbPUv0yMzKRlmRaV8AE5wKPQX5NcsHElNnagwwbYYOTKHcSw==
 
 before_script:
@@ -30,16 +29,27 @@ before_script:
   - cp src/main/maven/settings.xml ~/.m2/settings.xml
   - git remote set-url origin git@github.com:$REPO_NAME.git
 
+build:
+  ci:
+    - mvn -B clean package
+
 after_success:
-  - mvn clean cobertura:cobertura coveralls:report deploy
+  - export CURRENT_VERSION=`mvn -B -q -N org.codehaus.mojo:exec-maven-plugin:1.6.0:exec -Dexec.executable='echo' -Dexec.args='${project.version}'`
   - >
-    if [ "$BRANCH" == "master" ]; then 
-      mvn versions:set "-DnewVersion=${SEED_VERSION}";
-      git commit -am "Releasing version ${SEED_VERSION}";
-      mvn clean deploy;
-      git checkout -b develop;
-      git merge master;
-      mvn build-helper:parse-version versions:set -DnewVersion=$\{parsedVersion.majorVersion\}.$\{parsedVersion.minorVersion\}.$\{parsedVersion.nextIncrementalVersion\}-SNAPSHOT;
-      git commit -am "Prepare for next development iteration";
-      mvn deploy;
-    fi;
+    if [ "$BRANCH" == "master" ] && [ "$SEED_VERSION" != "$CURRENT_VERSION" ]; then
+      mvn -B versions:set "-DnewVersion=${SEED_VERSION}" &&
+      git commit -am "Releasing version ${SEED_VERSION}" &&
+      git tag -a "${SEED_VERSION}" -m "Releasing version ${SEED_VERSION}" &&
+      mvn -B clean deploy &&
+      git checkout -B develop origin/develop &&
+      git merge --no-edit master &&
+      mvn -B build-helper:parse-version versions:set -DnewVersion=$\{parsedVersion.majorVersion\}.$\{parsedVersion.minorVersion\}.$\{parsedVersion.nextIncrementalVersion\}-SNAPSHOT &&
+      git commit -am "Prepare for next development iteration" &&
+      ssh-agent bash -c "ssh-add /tmp/ssh/ShippableSSHKey; git push --atomic origin master develop --tags" &&
+    fi
+  - mvn -B deploy
+
+integrations:
+  key:
+    - integrationName: "Shippable SSH Key"
+      type: sshKey

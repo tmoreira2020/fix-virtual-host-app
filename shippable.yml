@@ -45,7 +45,7 @@ after_success:
       git merge --no-edit master &&
       mvn -B build-helper:parse-version versions:set -DnewVersion=$\{parsedVersion.majorVersion\}.$\{parsedVersion.minorVersion\}.$\{parsedVersion.nextIncrementalVersion\}-SNAPSHOT &&
       git commit -am "Prepare for next development iteration" &&
-      ssh-agent bash -c "ssh-add /tmp/ssh/ShippableSSHKey; git push --atomic origin master develop --tags" &&
+      ssh-agent bash -c "ssh-add /tmp/ssh/ShippableSSHKey; git push --atomic origin master develop --tags"
     fi
   - mvn -B deploy
 

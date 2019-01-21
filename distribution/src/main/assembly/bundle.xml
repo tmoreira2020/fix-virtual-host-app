@@ -39,7 +39,7 @@
 		<moduleSet>
 			<useAllReactorProjects>true</useAllReactorProjects>
 			<includes>
-				<include>br.com.thiagomoreira.liferay.plugins.fix-virtual-host-app:*:war:${project.version}</include>
+				<include>br.com.thiagomoreira.liferay.plugins.fix-virtual-host-app:*:jar:${project.version}</include>
 			</includes>
 			<binaries>
 				<includeDependencies>false</includeDependencies>

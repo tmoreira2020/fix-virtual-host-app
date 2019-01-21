@@ -27,7 +27,7 @@ env:
 before_script:
   - mkdir -p ~/.m2
   - cp src/main/maven/settings.xml ~/.m2/settings.xml
-  - git remote set-url origin git@github.com:$REPO_NAME.git
+  - git remote set-url origin git@github.com:$REPO_FULL_NAME.git
 
 build:
   ci:

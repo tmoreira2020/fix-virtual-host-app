@@ -54,8 +54,7 @@
 				<artifactId>bnd-maven-plugin</artifactId>
 				<version>3.3.0</version>
 				<configuration>
-					<bnd><![CDATA[
-							Symbolic-Name: br.com.thiagomoreira.liferay.plugins.fix-virtual-host-hook
+					<bnd><![CDATA[Symbolic-Name: br.com.thiagomoreira.liferay.plugins.fix-virtual-host-hook
 							-sources: true
 							-metatype: *]]></bnd>
 				</configuration>

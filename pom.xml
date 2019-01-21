@@ -41,8 +41,7 @@
 		<tag>HEAD</tag>
 		<url>https://github.com/tmoreira2020/fix-virtual-host-app</url>
 	</scm>
-	<properties>
-	</properties>
+	<properties></properties>
 	<dependencyManagement>
 		<dependencies>
 			<dependency>

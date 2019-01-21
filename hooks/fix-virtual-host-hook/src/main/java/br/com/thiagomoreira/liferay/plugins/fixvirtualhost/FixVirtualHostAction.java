@@ -19,39 +19,47 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import org.osgi.service.component.annotations.Component;
+
+import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Property;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.events.ActionException;
-import com.liferay.portal.kernel.events.SimpleAction;
+import com.liferay.portal.kernel.events.LifecycleAction;
+import com.liferay.portal.kernel.events.LifecycleEvent;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.Company;
+import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.model.LayoutSet;
+import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
+import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
+import com.liferay.portal.kernel.service.LayoutSetLocalServiceUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PropertiesUtil;
 import com.liferay.portal.kernel.util.PropsUtil;
-import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.model.Company;
-import com.liferay.portal.model.Group;
-import com.liferay.portal.model.LayoutSet;
-import com.liferay.portal.service.CompanyLocalServiceUtil;
-import com.liferay.portal.service.LayoutSetLocalServiceUtil;
-import com.liferay.portal.service.persistence.GroupActionableDynamicQuery;
 
 /**
  * @author Thiago Moreira
  */
-public class FixVirtualHostAction extends SimpleAction {
+@Component(immediate = true, property = {"key=application.startup.events"}, service = LifecycleAction.class)
+public class FixVirtualHostAction implements LifecycleAction {
 
 	private static Log log = LogFactoryUtil.getLog(FixVirtualHostAction.class);
 
 	@Override
-	public void run(String[] ids) throws ActionException {
+	public void processLifecycleEvent(LifecycleEvent lifecycleEvent)
+			throws ActionException {
 		try {
-			doRun(GetterUtil.getLong(ids[0]));
+			String[] companyIds = lifecycleEvent.getIds();
+			for (String companyId : companyIds) {
+				doRun(GetterUtil.getLong(companyId));
+			}
 		} catch (Exception e) {
 			throw new ActionException(e);
 		}
@@ -89,62 +97,77 @@ public class FixVirtualHostAction extends SimpleAction {
 							company.getMaxUsers(), company.getActive());
 				}
 
-				GroupActionableDynamicQuery actionableDynamicQuery = new GroupActionableDynamicQuery() {
+				ActionableDynamicQuery actionableDynamicQuery = GroupLocalServiceUtil
+						.getActionableDynamicQuery();
 
-					@Override
-					protected void performAction(Object object)
-							throws PortalException, SystemException {
-						Group group = (Group) object;
+				actionableDynamicQuery
+						.setAddCriteriaMethod(new ActionableDynamicQuery.AddCriteriaMethod() {
 
-						LayoutSet layoutSet = group.getPublicLayoutSet();
+							@Override
+							public void addCriteria(DynamicQuery dynamicQuery) {
+								Property property = PropertyFactoryUtil
+										.forName("site");
 
-						if (layoutSet != null) {
-							String layoutVirtualHost = layoutSet
-									.getVirtualHostname();
-							layoutVirtualHost = fixVirtualHost(
-									layoutVirtualHost, virtualHostMapping);
-
-							if (Validator.isNotNull(layoutVirtualHost)) {
-								log.info("Updating layout virtual host to: "
-										+ layoutVirtualHost);
-
-								LayoutSetLocalServiceUtil.updateVirtualHost(
-										group.getGroupId(), false,
-										layoutVirtualHost);
+								dynamicQuery.add(property.eq(true));
 							}
-						}
 
-						layoutSet = group.getPrivateLayoutSet();
+						});
 
-						if (layoutSet != null) {
-							String layoutVirtualHost = layoutSet
-									.getVirtualHostname();
-							layoutVirtualHost = fixVirtualHost(
-									layoutVirtualHost, virtualHostMapping);
+				actionableDynamicQuery
+						.setPerformActionMethod(new ActionableDynamicQuery.PerformActionMethod<Group>() {
 
-							if (Validator.isNotNull(layoutVirtualHost)) {
-								log.info("Updating layout virtual host to: "
-										+ layoutVirtualHost);
+							@Override
+							public void performAction(Group group)
+									throws PortalException {
 
-								LayoutSetLocalServiceUtil.updateVirtualHost(
-										group.getGroupId(), true,
-										layoutVirtualHost);
+								LayoutSet layoutSet = group
+										.getPublicLayoutSet();
+
+								if (layoutSet != null) {
+									String layoutVirtualHost = layoutSet
+											.getVirtualHostname();
+									layoutVirtualHost = fixVirtualHost(
+											layoutVirtualHost,
+											virtualHostMapping);
+
+									if (Validator.isNotNull(layoutVirtualHost)) {
+										log.info("Updating layout virtual host to: "
+												+ layoutVirtualHost);
+
+										LayoutSetLocalServiceUtil
+												.updateVirtualHost(
+														group.getGroupId(),
+														false,
+														layoutVirtualHost);
+									}
+								}
+
+								layoutSet = group.getPrivateLayoutSet();
+
+								if (layoutSet != null) {
+									String layoutVirtualHost = layoutSet
+											.getVirtualHostname();
+									layoutVirtualHost = fixVirtualHost(
+											layoutVirtualHost,
+											virtualHostMapping);
+
+									if (Validator.isNotNull(layoutVirtualHost)) {
+										log.info("Updating layout virtual host to: "
+												+ layoutVirtualHost);
+
+										LayoutSetLocalServiceUtil.updateVirtualHost(
+												group.getGroupId(), true,
+												layoutVirtualHost);
+									}
+								}
 							}
-						}
-					}
 
-					@Override
-					protected void addCriteria(DynamicQuery dynamicQuery) {
-						Property property = PropertyFactoryUtil.forName("site");
-
-						dynamicQuery.add(property.eq(true));
-					}
-				};
+						});
 
 				actionableDynamicQuery.setCompanyId(companyId);
 				actionableDynamicQuery.performActions();
 			} else {
-				log.info("Skiiping executing due properties values virtual.host.old.prefix="
+				log.info("Skipping executing due properties values virtual.host.old.prefix="
 						+ virtualHostOldPrefix
 						+ " and virtual.host.new.prefix="
 						+ virtualHostNewPrefix);

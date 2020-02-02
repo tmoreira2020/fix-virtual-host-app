@@ -52,24 +52,12 @@
 			<plugin>
 				<groupId>biz.aQute.bnd</groupId>
 				<artifactId>bnd-maven-plugin</artifactId>
-				<version>3.3.0</version>
+				<version>5.0.0</version>
 				<configuration>
 					<bnd><![CDATA[Symbolic-Name: br.com.thiagomoreira.liferay.plugins.fix-virtual-host-hook
 							-sources: true
 							-metatype: *]]></bnd>
 				</configuration>
-				<dependencies>
-					<dependency>
-						<groupId>biz.aQute.bnd</groupId>
-						<artifactId>biz.aQute.bndlib</artifactId>
-						<version>3.3.0</version>
-					</dependency>
-					<dependency>
-						<groupId>com.liferay</groupId>
-						<artifactId>com.liferay.ant.bnd</artifactId>
-						<version>2.0.50</version>
-					</dependency>
-				</dependencies>
 				<executions>
 					<execution>
 						<goals>
@@ -81,7 +69,6 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.6</version>
 				<configuration>
 					<archive>
 						<manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>

@@ -180,6 +180,11 @@ public class FixVirtualHostAction implements LifecycleAction {
 
 		if (Validator.isNotNull(virtualHost)) {
 			int endIndex = virtualHost.indexOf(StringPool.PERIOD);
+			if (endIndex == -1) {
+				log.warn("Invalid virtual host format: " + virtualHost);
+				return null;
+			}
+
 			String currentPrefix = virtualHost.substring(0, endIndex);
 			String virtualHostNewPrefix = virtualHostMapping.get(currentPrefix);
 

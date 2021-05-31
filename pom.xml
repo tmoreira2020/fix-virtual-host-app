@@ -25,7 +25,7 @@
 	</parent>
 	<groupId>br.com.thiagomoreira.liferay.plugins.fix-virtual-host-app</groupId>
 	<artifactId>fix-virtual-host-app-parent</artifactId>
-	<version>4.1.1-SNAPSHOT</version>
+	<version>5.0.0</version>
 	<packaging>pom</packaging>
 	<name>Fix Virtual Host App Parent</name>
 	<description>This app acts in the startup time of portal and help to fix the virtual host of Liferay. Given an existent database dump that points to a domain and a new environment needs to have a different domain the app will read a system property called liferay.virtual.host and set the value as the new company virtual host. For instance if the database dump points to www.myliferay.com and the property points to dev.myliferay.com the app will replace the former with the value of the latter. It was developed to avoid the redirect loop problem.</description>
@@ -38,10 +38,10 @@
 	<scm>
 		<connection>scm:git:git@github.com:tmoreira2020/fix-virtual-host-app.git</connection>
 		<developerConnection>scm:git:git@github.com:tmoreira2020/fix-virtual-host-app.git</developerConnection>
-		<tag>HEAD</tag>
+		<tag>5.0.0</tag>
 		<url>https://github.com/tmoreira2020/fix-virtual-host-app</url>
 	</scm>
-	<properties></properties>
+	<properties />
 	<dependencyManagement>
 		<dependencies>
 			<dependency>

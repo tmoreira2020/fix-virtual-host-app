@@ -18,6 +18,7 @@ package br.com.thiagomoreira.liferay.plugins.fixvirtualhost;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.TreeMap;
 
 import org.osgi.service.component.annotations.Component;
 
@@ -109,8 +110,12 @@ public class FixVirtualHostAction implements LifecycleAction {
 										.forName("site");
 
 								dynamicQuery.add(property.eq(true));
-							}
 
+								property = PropertyFactoryUtil
+										.forName("friendlyURL");
+
+								dynamicQuery.add(property.ne("/global"));
+							}
 						});
 
 				actionableDynamicQuery
@@ -124,40 +129,81 @@ public class FixVirtualHostAction implements LifecycleAction {
 										.getPublicLayoutSet();
 
 								if (layoutSet != null) {
-									String layoutVirtualHost = layoutSet
-											.getVirtualHostname();
-									layoutVirtualHost = fixVirtualHost(
-											layoutVirtualHost,
-											virtualHostMapping);
+									TreeMap<String, String> modifiedLayoutVirtualHosts = new TreeMap<String, String>();
+									TreeMap<String, String> layoutVirtualHosts = layoutSet
+											.getVirtualHostnames();
 
-									if (Validator.isNotNull(layoutVirtualHost)) {
-										log.info("Updating layout virtual host to: "
-												+ layoutVirtualHost);
+									log.info("Inspecting "
+											+ layoutVirtualHosts.size()
+											+ " virtual hosts of public layout.");
 
-										LayoutSetLocalServiceUtil
-												.updateVirtualHost(
-														group.getGroupId(),
-														false,
-														layoutVirtualHost);
+									for (String layoutVirtualHost : layoutVirtualHosts
+											.keySet()) {
+										String modifiedLayoutVirtualHost = fixVirtualHost(
+												layoutVirtualHost,
+												virtualHostMapping);
+
+										if (Validator
+												.isNotNull(modifiedLayoutVirtualHost)) {
+											String languageId = layoutVirtualHosts
+													.get(layoutVirtualHost);
+											log.info("Adding layout virtual host "
+													+ modifiedLayoutVirtualHost
+													+ " for " + languageId);
+
+											modifiedLayoutVirtualHosts.put(
+													modifiedLayoutVirtualHost,
+													languageId);
+										}
+									}
+
+									if (modifiedLayoutVirtualHosts.size() > 0) {
+										log.info("Updatig layout virtual hosts with mappig: "
+												+ modifiedLayoutVirtualHosts);
+
+										LayoutSetLocalServiceUtil.updateVirtualHosts(
+												group.getGroupId(), false,
+												modifiedLayoutVirtualHosts);
 									}
 								}
 
 								layoutSet = group.getPrivateLayoutSet();
 
 								if (layoutSet != null) {
-									String layoutVirtualHost = layoutSet
-											.getVirtualHostname();
-									layoutVirtualHost = fixVirtualHost(
-											layoutVirtualHost,
-											virtualHostMapping);
+									TreeMap<String, String> modifiedLayoutVirtualHosts = new TreeMap<String, String>();
+									TreeMap<String, String> layoutVirtualHosts = layoutSet
+											.getVirtualHostnames();
 
-									if (Validator.isNotNull(layoutVirtualHost)) {
-										log.info("Updating layout virtual host to: "
-												+ layoutVirtualHost);
+									log.info("Inspecting "
+											+ layoutVirtualHosts.size()
+											+ " virtual hosts of private layout.");
 
-										LayoutSetLocalServiceUtil.updateVirtualHost(
+									for (String layoutVirtualHost : layoutVirtualHosts
+											.keySet()) {
+										String modifiedLayoutVirtualHost = fixVirtualHost(
+												layoutVirtualHost,
+												virtualHostMapping);
+
+										if (Validator
+												.isNotNull(modifiedLayoutVirtualHost)) {
+											String languageId = layoutVirtualHosts
+													.get(layoutVirtualHost);
+											log.info("Adding layout virtual host "
+													+ modifiedLayoutVirtualHost
+													+ " for " + languageId);
+
+											modifiedLayoutVirtualHosts.put(
+													modifiedLayoutVirtualHost,
+													languageId);
+										}
+									}
+
+									if (modifiedLayoutVirtualHosts.size() > 0) {
+										log.info("Updatig layout virtual hosts with mappig: "
+												+ modifiedLayoutVirtualHosts);
+										LayoutSetLocalServiceUtil.updateVirtualHosts(
 												group.getGroupId(), true,
-												layoutVirtualHost);
+												modifiedLayoutVirtualHosts);
 									}
 								}
 							}

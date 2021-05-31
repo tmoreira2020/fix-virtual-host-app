@@ -21,7 +21,7 @@
 	<parent>
 		<groupId>br.com.thiagomoreira.liferay.plugins.fix-virtual-host-app</groupId>
 		<artifactId>hooks</artifactId>
-		<version>5.0.0</version>
+		<version>5.0.1-SNAPSHOT</version>
 	</parent>
 	<artifactId>fix-virtual-host-hook</artifactId>
 	<name>Fix Virtual Host Hook</name>

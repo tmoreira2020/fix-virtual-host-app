@@ -16,10 +16,12 @@
 package br.com.thiagomoreira.liferay.plugins.fixvirtualhost;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.TreeMap;
 
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 
 import com.liferay.petra.string.StringPool;
@@ -27,9 +29,6 @@ import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Property;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
-import com.liferay.portal.kernel.events.ActionException;
-import com.liferay.portal.kernel.events.LifecycleAction;
-import com.liferay.portal.kernel.events.LifecycleEvent;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -39,7 +38,6 @@ import com.liferay.portal.kernel.model.LayoutSet;
 import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
 import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
 import com.liferay.portal.kernel.service.LayoutSetLocalServiceUtil;
-import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PropertiesUtil;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -48,21 +46,22 @@ import com.liferay.portal.kernel.util.Validator;
 /**
  * @author Thiago Moreira
  */
-@Component(immediate = true, property = {"key=application.startup.events"}, service = LifecycleAction.class)
-public class FixVirtualHostAction implements LifecycleAction {
+@Component(immediate = true)
+public class FixVirtualHostAction {
 
 	private static Log log = LogFactoryUtil.getLog(FixVirtualHostAction.class);
 
-	@Override
-	public void processLifecycleEvent(LifecycleEvent lifecycleEvent)
-			throws ActionException {
+	
+	@Activate
+	public void activate() {
 		try {
-			String[] companyIds = lifecycleEvent.getIds();
-			for (String companyId : companyIds) {
-				doRun(GetterUtil.getLong(companyId));
+			List<Company> companies = CompanyLocalServiceUtil.getCompanies();
+			
+			for (Company company : companies) {
+				doRun(company.getCompanyId());
 			}
 		} catch (Exception e) {
-			throw new ActionException(e);
+			log.error(e);
 		}
 	}
 

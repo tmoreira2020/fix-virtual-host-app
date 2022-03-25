@@ -60,6 +60,8 @@
 				<version>5.0.0</version>
 				<configuration>
 					<bnd><![CDATA[Symbolic-Name: br.com.thiagomoreira.liferay.plugins.fix-virtual-host-hook
+							-consumer-policy: ${replacestring;${range;[==,==]};.*,(.*)];$1}
+							-provider-policy: ${replacestring;${range;[==,==]};.*,(.*)];$1}
 							-sources: true
 							-metatype: *]]></bnd>
 				</configuration>

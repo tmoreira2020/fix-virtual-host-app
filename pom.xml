@@ -41,32 +41,29 @@
 		<tag>HEAD</tag>
 		<url>https://github.com/tmoreira2020/fix-virtual-host-app</url>
 	</scm>
-	<properties />
+
+	<properties>
+		<liferay.version>7.4.3.120-ga120</liferay.version>
+	</properties>
+
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
 				<groupId>com.liferay.portal</groupId>
-				<artifactId>release.portal.bom</artifactId>
-				<version>7.4.3.16</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-			<dependency>
-				<groupId>com.liferay.portal</groupId>
-				<artifactId>release.portal.bom.compile.only</artifactId>
-				<version>7.4.3.16</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-			<dependency>
-				<groupId>com.liferay.portal</groupId>
-				<artifactId>release.portal.bom.third.party</artifactId>
-				<version>7.4.3.16</version>
-				<type>pom</type>
-				<scope>import</scope>
+				<artifactId>release.portal.api</artifactId>
+				<version>${liferay.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.liferay.portal</groupId>
+			<artifactId>release.portal.api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+	</dependencies>
+
 	<build>
 		<resources>
 			<resource>

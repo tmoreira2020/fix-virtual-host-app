@@ -38,7 +38,7 @@
 			<plugin>
 				<groupId>biz.aQute.bnd</groupId>
 				<artifactId>bnd-maven-plugin</artifactId>
-				<version>5.0.0</version>
+				<version>6.4.0</version>
 				<configuration>
 					<bnd><![CDATA[Symbolic-Name: br.com.thiagomoreira.liferay.plugins.fix-virtual-host-hook
 							-consumer-policy: ${replacestring;${range;[==,==]};.*,(.*)];$1}

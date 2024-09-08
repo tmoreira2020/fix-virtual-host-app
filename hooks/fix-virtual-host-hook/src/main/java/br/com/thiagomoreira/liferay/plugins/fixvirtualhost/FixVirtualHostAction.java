@@ -241,8 +241,8 @@ public class FixVirtualHostAction {
 					String defaultPrefix = PropsUtil
 							.get("virtual.host.default.prefix");
 
-					if (!virtualHost.startsWith(defaultPrefix)) {
-						return defaultPrefix + StringPool.PERIOD + virtualHost;
+					if (Validator.isNotNull(defaultPrefix) && !virtualHost.startsWith(defaultPrefix)) {
+						return defaultPrefix + virtualHost;
 					}
 				}
 			}
